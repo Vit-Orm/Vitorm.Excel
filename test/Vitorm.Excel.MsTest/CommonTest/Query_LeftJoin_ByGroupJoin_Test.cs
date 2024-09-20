@@ -82,7 +82,7 @@ namespace Vitorm.MsTest.CommonTest
                         father,
                         mother,
                         testId = user.id + 100,
-                        hasFather = father.name != null ? true : false
+                        hasFather = father != null && father.name != null ? true : false
                     };
 
                 query = query.Skip(1).Take(2);
