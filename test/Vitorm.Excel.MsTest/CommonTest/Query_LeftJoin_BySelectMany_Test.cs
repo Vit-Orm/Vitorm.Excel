@@ -64,7 +64,7 @@ namespace Vitorm.MsTest.CommonTest
                         userClass,
                         userClass.name,
                         testId = user.id + 100,
-                        hasFather = father.name != null ? true : false
+                        hasFather = father != null && father.name != null ? true : false
                     };
 
                 query = query.Skip(1).Take(2);
@@ -93,7 +93,7 @@ namespace Vitorm.MsTest.CommonTest
             {
                 var query = from user in userQuery
                             from father in userQuery.Where(father => user.fatherId == father.id).DefaultIfEmpty()
-                            where user.id > 2 && father.name != null
+                            where user.id > 2 && father != null && father.name != null
                             orderby user.id
                             select new
                             {
@@ -144,8 +144,8 @@ namespace Vitorm.MsTest.CommonTest
                                 userId = user.id + 100,
                                 hasFather = user.fatherId != null ? true : false,
                                 hasFather2 = father != null,
-                                fatherName = father.name,
-                                motherName = mother.name,
+                                fatherName = father != null ? father.name : default,
+                                motherName = mother != null ? mother.name : default,
                             };
 
                 var userList = query.ToList();
@@ -171,7 +171,7 @@ namespace Vitorm.MsTest.CommonTest
             {
                 var count = (from user in userQuery
                              from father in userQuery.Where(father => user.fatherId == father.id).DefaultIfEmpty()
-                             where user.id > 2 && father.name == null
+                             where user.id > 2 && (father == null || father.name == null)
                              select new
                              {
                                  father
