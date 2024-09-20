@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31606.5
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{75C25D0B-8529-4E3F-AF43-6EC1E9E40828}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		doc\ReleaseLog.md = doc\ReleaseLog.md
+		doc\TODO.md = doc\TODO.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{7904FE51-04FF-4477-8E3A-CC340389EE32}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{05176905-A2A5-4015-9F04-2904506C902F}"
+	ProjectSection(SolutionItems) = preProject
+		src\Versions.props = src\Versions.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vitorm.Excel", "src\Vitorm.Excel\Vitorm.Excel.csproj", "{7AC01F47-AD5A-4B61-9F05-38094C1EF23B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vitorm.Excel.MsTest", "test\Vitorm.Excel.MsTest\Vitorm.Excel.MsTest.csproj", "{42E0FE60-9E3B-4B59-A69E-E50A20C89D6D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vitorm.Excel.Data.MsTest", "test\Vitorm.Excel.Data.MsTest\Vitorm.Excel.Data.MsTest.csproj", "{EB69697B-0CDB-4A28-AACF-22C31137DDE9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AC01F47-AD5A-4B61-9F05-38094C1EF23B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AC01F47-AD5A-4B61-9F05-38094C1EF23B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AC01F47-AD5A-4B61-9F05-38094C1EF23B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AC01F47-AD5A-4B61-9F05-38094C1EF23B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42E0FE60-9E3B-4B59-A69E-E50A20C89D6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42E0FE60-9E3B-4B59-A69E-E50A20C89D6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42E0FE60-9E3B-4B59-A69E-E50A20C89D6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42E0FE60-9E3B-4B59-A69E-E50A20C89D6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB69697B-0CDB-4A28-AACF-22C31137DDE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB69697B-0CDB-4A28-AACF-22C31137DDE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB69697B-0CDB-4A28-AACF-22C31137DDE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB69697B-0CDB-4A28-AACF-22C31137DDE9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7AC01F47-AD5A-4B61-9F05-38094C1EF23B} = {05176905-A2A5-4015-9F04-2904506C902F}
+		{42E0FE60-9E3B-4B59-A69E-E50A20C89D6D} = {7904FE51-04FF-4477-8E3A-CC340389EE32}
+		{EB69697B-0CDB-4A28-AACF-22C31137DDE9} = {7904FE51-04FF-4477-8E3A-CC340389EE32}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C7DA16E3-9949-49FA-B0B4-F830636DE60F}
+	EndGlobalSection
+EndGlobal
