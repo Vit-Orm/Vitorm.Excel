@@ -56,7 +56,7 @@ namespace App
         static void Main2(string[] args)
         {
             // #1 Init
-            using var dbContext = new Vitorm.Excel.DbContext("Excel://mongoadmin:mongoadminsecret@localhost:27017");
+            using var dbContext = new Vitorm.Excel.DbContext("db_orm.xlsx");
             dbContext.TryDropTable<User>();
             dbContext.TryCreateTable<User>();
             dbContext.Add(new User { id = 1, name = "lith" });
@@ -96,7 +96,7 @@ namespace App
         static void Main(string[] args)
         {
             // #1 Configures Vitorm
-            using var dbContext = new Vitorm.Excel.DbContext("Excel://mongoadmin:mongoadminsecret@localhost:27017");
+            using var dbContext = new Vitorm.Excel.DbContext("db_orm.xlsx");
 
             // #2 Create Table
             dbContext.TryDropTable<User>();
