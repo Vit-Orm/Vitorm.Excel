@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\Versions.props" />
+
+    <PropertyGroup>
+        <pack>nuget</pack>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>9.0</LangVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Authors>Lith</Authors>
+        <Description>orm for Excel</Description>
+        <PackageProjectUrl>https://github.com/Vit-Orm/Vitorm.Excel</PackageProjectUrl>
+        <PackageIcon>vitorm_logo_v1.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>orm vitorm database Excel</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\doc\vitorm_logo_v1.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Include="..\..\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="EPPlus" Version="7.3.2" />
+        <PackageReference Include="Vitorm" Version="$(Vitorm_Version)" />
+    </ItemGroup>
+
+
+</Project>
