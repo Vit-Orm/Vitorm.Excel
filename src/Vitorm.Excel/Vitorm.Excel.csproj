@@ -11,12 +11,13 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Authors>Lith</Authors>
         <Description>orm for Excel</Description>
-        <PackageProjectUrl>https://github.com/Vit-Orm/Vitorm.Excel</PackageProjectUrl>
+        <PackageTags>orm vitorm database Excel</PackageTags>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <PackageIcon>vitorm_logo_v1.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>orm vitorm database Excel</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
@@ -34,6 +35,5 @@
         <PackageReference Include="EPPlus" Version="7.3.2" />
         <PackageReference Include="Vitorm" Version="$(Vitorm_Version)" />
     </ItemGroup>
-
 
 </Project>
