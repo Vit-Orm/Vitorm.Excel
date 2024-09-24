@@ -1,1 +1,0 @@
-﻿# Vitorm.Excel ReleaseLog
