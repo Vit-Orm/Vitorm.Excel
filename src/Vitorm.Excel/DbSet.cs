@@ -22,21 +22,21 @@ namespace Vitorm.Excel
     {
         public static IDbSet CreateDbSet(IDbContext dbContext, IEntityDescriptor entityDescriptor)
         {
-            return _CreateDbSet.MakeGenericMethod(entityDescriptor.entityType)
+            return _CreateDbSet.MakeGenericMethod(entityDescriptor.entityType, entityDescriptor.key?.type ?? typeof(string))
                      .Invoke(null, new object[] { dbContext, entityDescriptor }) as IDbSet;
         }
 
-        static readonly MethodInfo _CreateDbSet = new Func<DbContext, IEntityDescriptor, IDbSet>(CreateDbSet<object>)
+        static readonly MethodInfo _CreateDbSet = new Func<DbContext, IEntityDescriptor, IDbSet>(CreateDbSet<object, string>)
                    .Method.GetGenericMethodDefinition();
-        public static IDbSet<Entity> CreateDbSet<Entity>(DbContext dbContext, IEntityDescriptor entityDescriptor)
+        public static IDbSet<Entity> CreateDbSet<Entity, EntityKey>(DbContext dbContext, IEntityDescriptor entityDescriptor)
         {
-            return new DbSet<Entity>(dbContext, entityDescriptor);
+            return new DbSet<Entity, EntityKey>(dbContext, entityDescriptor);
         }
 
     }
 
 
-    public partial class DbSet<Entity> : IDbSet<Entity>
+    public partial class DbSet<Entity, EntityKey> : IDbSet<Entity>
     {
         public virtual IDbContext dbContext { get; protected set; }
         public virtual DbContext DbContext => (DbContext)dbContext;
@@ -121,14 +121,7 @@ namespace Vitorm.Excel
             }
         }
 
-        protected virtual int UpdateRangeWithoutSave(IEnumerable<Entity> entities)
-        {
-            var method = (new Func<IEnumerable<Entity>, int>(UpdateRangeWithoutSave<string>))
-                          .GetMethodInfo()
-                          .GetGenericMethodDefinition().MakeGenericMethod(entityDescriptor.key.type);
 
-            return (int)method.Invoke(this, new object[] { entities });
-        }
         protected virtual void SetRow(Entity entity, int rowIndex)
         {
             foreach (var col in entityDescriptor.allColumns)
@@ -138,53 +131,19 @@ namespace Vitorm.Excel
                 sheet.SetValue(rowIndex, colIndex, value);
             }
         }
-        protected virtual int DeleteByKeyWithoutSave(object keyValue)
-        {
-            var method = (new Func<string, int>(DeleteByKeyWithoutSave<string>))
-                          .GetMethodInfo()
-                          .GetGenericMethodDefinition().MakeGenericMethod(entityDescriptor.key.type);
-
-            return (int)method.Invoke(this, new object[] { keyValue });
-        }
-        protected virtual int DeleteByKeyWithoutSave<Key>(Key keyValue)
-        {
-            int colIndex = columnIndexes.TryGetValue(entityDescriptor.key.columnName, out var i) ? i : throw new ArgumentOutOfRangeException("key column not exist.");
-
-            var lastRowIndex = sheet.Dimension.End.Row;
-
-            int count = 0;
-            for (var rowIndex = lastRowIndex; rowIndex >= 2; rowIndex--)
-            {
-                var key = (Key)TypeUtil.ConvertToType(sheet.GetValue(rowIndex, colIndex), typeof(Key));
-                if (keyValue?.Equals(key) == true)
-                {
-                    sheet.DeleteRow(rowIndex);
-                    count++;
-                }
-            }
-            return count;
-        }
-
 
         protected virtual int DeleteByKeysWithoutSave<Key>(IEnumerable<Key> keys)
         {
-            var method = (new Func<IEnumerable<string>, int>(DeleteByKeys_<string, int>))
-                        .GetMethodInfo()
-                        .GetGenericMethodDefinition().MakeGenericMethod(typeof(Key), entityDescriptor.key.type);
+            IEnumerable<EntityKey> entityKeys;
+            if (typeof(Key) == typeof(EntityKey))
+            {
+                entityKeys = (IEnumerable<EntityKey>)keys;
+            }
+            else
+            {
+                entityKeys = keys.Select(key => (EntityKey)TypeUtil.ConvertToType(key, typeof(EntityKey)));
+            }
 
-            return (int)method.Invoke(this, new object[] { keys });
-        }
-
-        protected virtual int DeleteByKeys_<Key, EntityKey>(IEnumerable<Key> keys)
-        {
-            if (typeof(Key) == typeof(EntityKey)) return DeleteByKeysWithoutSave(keys);
-
-            var entityKeys = keys.Select(key => (EntityKey)TypeUtil.ConvertToType(key, typeof(EntityKey)));
-            return DeleteByKeys_(entityKeys);
-        }
-
-        protected virtual int DeleteByKeys_<Key>(IEnumerable<Key> keys)
-        {
             int colIndex = columnIndexes.TryGetValue(entityDescriptor.key.columnName, out var i) ? i : throw new ArgumentOutOfRangeException("key column not exist.");
 
             var lastRowIndex = sheet.Dimension.End.Row;
@@ -192,8 +151,8 @@ namespace Vitorm.Excel
             int count = 0;
             for (var rowIndex = lastRowIndex; rowIndex >= 2; rowIndex--)
             {
-                var key = (Key)TypeUtil.ConvertToType(sheet.GetValue(rowIndex, colIndex), typeof(Key));
-                if (keys.Contains(key))
+                var key = (EntityKey)TypeUtil.ConvertToType(sheet.GetValue(rowIndex, colIndex), typeof(EntityKey));
+                if (entityKeys.Contains(key))
                 {
                     sheet.DeleteRow(rowIndex);
                     count++;
@@ -472,14 +431,13 @@ namespace Vitorm.Excel
         }
 
 
-        protected int UpdateRangeWithoutSave<Key>(IEnumerable<Entity> entities)
+        protected virtual int UpdateRangeWithoutSave(IEnumerable<Entity> entities)
         {
-
             AddColumnsIfNotExist();
 
             // key -> entity
             var entityMap =
-                 entities.Select(entity => (key: (Key)entityDescriptor.key.GetValue(entity), entity: entity))
+                 entities.Select(entity => (key: (EntityKey)entityDescriptor.key.GetValue(entity), entity: entity))
                  .GroupBy(item => item.key).Select(group => (key: group.Key, entity: group.Last().entity))
                  .ToDictionary(item => item.key, item => item.entity);
 
@@ -487,7 +445,7 @@ namespace Vitorm.Excel
             foreach (var item in GetEntities())
             {
                 var oldEntity = item.entity;
-                var key = (Key)entityDescriptor.key.GetValue(oldEntity);
+                var key = (EntityKey)entityDescriptor.key.GetValue(oldEntity);
                 if (!entityMap.TryGetValue(key, out var entity)) continue;
 
                 var rowIndex = item.rowIndex;
@@ -527,18 +485,8 @@ namespace Vitorm.Excel
         }
 
 
-        public virtual int DeleteByKey(object keyValue)
-        {
-            int count = DeleteByKeyWithoutSave(keyValue);
-            Save();
-            return count;
-        }
-        public virtual async Task<int> DeleteByKeyAsync(object keyValue)
-        {
-            int count = DeleteByKeyWithoutSave(keyValue);
-            await SaveAsync();
-            return count;
-        }
+        public virtual int DeleteByKey(object keyValue) => DeleteByKeys(new[] { keyValue });
+        public virtual Task<int> DeleteByKeyAsync(object keyValue) => DeleteByKeysAsync(new[] { keyValue });
 
 
 
