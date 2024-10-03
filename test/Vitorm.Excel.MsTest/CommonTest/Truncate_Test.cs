@@ -18,14 +18,22 @@ namespace Vitorm.MsTest.CommonTest
             }
 
             dbContext.Truncate<User>();
-
             DataSource.WaitForUpdate();
-
             // assert
             {
                 var count = dbContext.Query<User>().Count();
                 Assert.AreEqual(0, count);
             }
+
+            dbContext.Add(User.NewUser(1, forAdd: true));
+            DataSource.WaitForUpdate();
+            // assert
+            {
+                var users = dbContext.Query<User>().ToList();
+                Assert.AreEqual(1, users.Count);
+                Assert.AreEqual(1, users[0].id);
+            }
+
         }
 
 

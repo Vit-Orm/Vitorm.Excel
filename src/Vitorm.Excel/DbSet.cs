@@ -90,6 +90,14 @@ namespace Vitorm.Excel
 
 
 
+        protected virtual int GetMaxId()
+        {
+            var entities = GetEntities().Select(m => m.entity);
+            if (entities?.Any() != true) return 0;
+            return entities.Max(entity => int.TryParse(entityDescriptor.key.GetValue(entity)?.ToString(), out var id) ? id : 0);
+        }
+
+
         public virtual void AddColumnsIfNotExist()
         {
             var colsToAdd = entityDescriptor.allColumns.Where(col => !columnIndexes.TryGetValue(col.columnName, out var _)).ToList();
@@ -317,6 +325,26 @@ namespace Vitorm.Excel
         {
             AddColumnsIfNotExist();
 
+
+            #region generate identity key if needed
+            if (entityDescriptor.key.isIdentity)
+            {
+                int maxId = GetMaxId();
+
+                entities.ForEach(entity =>
+                {
+                    object keyValue = entityDescriptor.key.GetValue(entity);
+                    var keyIsEmpty = keyValue is null || keyValue.Equals(TypeUtil.DefaultValue(entityDescriptor.key.type));
+                    if (keyIsEmpty)
+                    {
+                        maxId++;
+                        entityDescriptor.key.SetValue(entity, maxId);
+                    }
+                });
+            }
+            #endregion
+
+
             var lastRowIndex = sheet.Dimension?.End.Row ?? 0;
             var range = sheet.Cells[lastRowIndex + 1, 1];
 
@@ -337,6 +365,26 @@ namespace Vitorm.Excel
         public virtual async Task AddRangeAsync(IEnumerable<Entity> entities)
         {
             AddColumnsIfNotExist();
+
+
+            #region generate identity key if needed
+            if (entityDescriptor.key.isIdentity)
+            {
+                int maxId = GetMaxId();
+
+                entities.ForEach(entity =>
+                {
+                    object keyValue = entityDescriptor.key.GetValue(entity);
+                    var keyIsEmpty = keyValue is null || keyValue.Equals(TypeUtil.DefaultValue(entityDescriptor.key.type));
+                    if (keyIsEmpty)
+                    {
+                        maxId++;
+                        entityDescriptor.key.SetValue(entity, maxId);
+                    }
+                });
+            }
+            #endregion
+
 
             var lastRowIndex = sheet.Dimension?.End.Row ?? 0;
             var range = sheet.Cells[lastRowIndex + 1, 1];
