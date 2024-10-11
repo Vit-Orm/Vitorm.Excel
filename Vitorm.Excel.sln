@@ -6,7 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{75C25D0B-8529-4E3F-AF43-6EC1E9E40828}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
-		doc\ReleaseLog.md = doc\ReleaseLog.md
+		doc\ReleaseNotes.md = doc\ReleaseNotes.md
 		doc\TODO.md = doc\TODO.md
 	EndProjectSection
 EndProject
