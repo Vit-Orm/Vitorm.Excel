@@ -56,6 +56,11 @@
 
     public class DataSource
     {
+        static DataSource()
+        {
+            Vit.Linq.FilterRules.FilterService.Instance.checkNullForString = true;
+        }
+
         public static void WaitForUpdate() { }
 
         public static DbContext CreateDbContextForWriting(bool autoInit = true) => CreateDbContext(autoInit);
