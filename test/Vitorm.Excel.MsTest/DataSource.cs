@@ -58,7 +58,7 @@
     {
         static DataSource()
         {
-            Vit.Linq.FilterRules.FilterService.Instance.checkNullForString = true;
+            //Vit.Linq.FilterRules.FilterService.Instance.checkNullForString = true;
         }
 
         public static void WaitForUpdate() { }
