@@ -69,7 +69,9 @@ namespace Vitorm.Excel
             _columnIndexes ??=
                 Enumerable.Range(1, sheet.Dimension?.End.Column ?? 0)
                 .Select(i => (index: i, columnName: sheet.GetValue<string>(1, i)))
-                .GroupBy(m => m.columnName).Select(g => g.First())
+                .GroupBy(m => m.columnName)
+                .Where(g => !string.IsNullOrWhiteSpace(g.Key))
+                .Select(g => g.First())
                 .ToDictionary(item => item.columnName, item => item.index)
             ;
         #endregion
@@ -100,7 +102,7 @@ namespace Vitorm.Excel
 
         public virtual void AddColumnsIfNotExist()
         {
-            var colsToAdd = entityDescriptor.allColumns.Where(col => !columnIndexes.TryGetValue(col.columnName, out var _)).ToList();
+            var colsToAdd = entityDescriptor.properties.Where(col => !columnIndexes.TryGetValue(col.columnName, out var _)).ToList();
 
             if (!colsToAdd.Any()) return;
 
@@ -118,7 +120,7 @@ namespace Vitorm.Excel
 
         public virtual void SetDateTimeFormat(string format = "yyyy-MM-dd HH:mm:ss")
         {
-            foreach (var col in entityDescriptor.allColumns.Where(col => TypeUtil.GetUnderlyingType(col.type) == typeof(DateTime)))
+            foreach (var col in entityDescriptor.properties.Where(col => TypeUtil.GetUnderlyingType(col.type) == typeof(DateTime)))
             {
                 if (!columnIndexes.TryGetValue(col.columnName, out var colIndex)) continue;
 
@@ -132,7 +134,7 @@ namespace Vitorm.Excel
 
         protected virtual void SetRow(Entity entity, int rowIndex)
         {
-            foreach (var col in entityDescriptor.allColumns)
+            foreach (var col in entityDescriptor.properties)
             {
                 if (!columnIndexes.TryGetValue(col.columnName, out var colIndex)) continue;
                 var value = col.GetValue(entity);
@@ -179,7 +181,7 @@ namespace Vitorm.Excel
                 var entity = (Entity)Activator.CreateInstance(entityDescriptor.entityType);
                 try
                 {
-                    foreach (var col in entityDescriptor.allColumns)
+                    foreach (var col in entityDescriptor.properties)
                     {
                         if (!columnIndexes.TryGetValue(col.columnName, out var colIndex)) continue;
 
@@ -237,7 +239,7 @@ namespace Vitorm.Excel
             var sheet = package.Workbook.Worksheets.Add(entityDescriptor.tableName);
 
             int colIndex = 0;
-            foreach (var col in entityDescriptor.allColumns)
+            foreach (var col in entityDescriptor.properties)
             {
                 colIndex++;
 
@@ -258,7 +260,7 @@ namespace Vitorm.Excel
             var sheet = package.Workbook.Worksheets.Add(entityDescriptor.tableName);
 
             int colIndex = 0;
-            foreach (var col in entityDescriptor.allColumns)
+            foreach (var col in entityDescriptor.properties)
             {
                 colIndex++;
 
@@ -334,7 +336,7 @@ namespace Vitorm.Excel
                 entities.ForEach(entity =>
                 {
                     object keyValue = entityDescriptor.key.GetValue(entity);
-                    var keyIsEmpty = keyValue is null || keyValue.Equals(TypeUtil.DefaultValue(entityDescriptor.key.type));
+                    var keyIsEmpty = keyValue is null || keyValue.Equals(TypeUtil.GetDefaultValue(entityDescriptor.key.type));
                     if (keyIsEmpty)
                     {
                         maxId++;
@@ -375,7 +377,7 @@ namespace Vitorm.Excel
                 entities.ForEach(entity =>
                 {
                     object keyValue = entityDescriptor.key.GetValue(entity);
-                    var keyIsEmpty = keyValue is null || keyValue.Equals(TypeUtil.DefaultValue(entityDescriptor.key.type));
+                    var keyIsEmpty = keyValue is null || keyValue.Equals(TypeUtil.GetDefaultValue(entityDescriptor.key.type));
                     if (keyIsEmpty)
                     {
                         maxId++;
